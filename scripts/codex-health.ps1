@@ -128,6 +128,18 @@ function Test-ProxyPort {
         $procId = ($listen | Select-Object -First 1).OwningProcess
         $p = Get-Process -Id $procId -ErrorAction SilentlyContinue
         Add-Line "代理端口 $($ProxyEp.Port) 正在监听（进程: $($p.ProcessName)）" 'OK'
+
+        # 切换节点/改设置会让代理引擎重启，重启瞬间端口消失几秒。
+        # 此时界面看起来一切正常，但在途请求会全部失败（日志里表现为 "after 1 ms"）。
+        try {
+            if ($p -and $p.StartTime) {
+                $age = ((Get-Date) - $p.StartTime).TotalSeconds
+                if ($age -lt 60) {
+                    Add-Line ("注意：代理引擎 {0} 秒前刚启动，此刻可能有几秒空窗" -f [int]$age) 'WARN'
+                }
+            }
+        } catch { }
+
         return $true
     }
     Add-Line "代理端口 $($ProxyEp.Port) 没有监听 —— 代理软件未运行或未开启系统代理" 'FAIL'
