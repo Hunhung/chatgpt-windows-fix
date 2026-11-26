@@ -1,0 +1,14 @@
+# 运行时产物（不应提交）
+reports/
+snapshots/
+backup-*/
+crash-leftovers/
+
+# 敏感/本机配置
+.env
+*.broken-*
+
+# 系统
+Thumbs.db
+desktop.ini
+.DS_Store
